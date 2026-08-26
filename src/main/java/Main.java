@@ -14,25 +14,26 @@ import javafx.stage.Stage;
  */
 public class Main extends Application {
 
+    private ScrollPane scrollPane;
+    private VBox dialogContainer;
+    private TextField userInput;
+    private Button sendButton;
+    private Scene scene;
     private final Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
     private final Image dukeImage = new Image(this.getClass().getResourceAsStream("/images/DaDuke.png"));
 
     @Override
     public void start(Stage stage) {
-        ScrollPane scrollPane = new ScrollPane();
-        VBox dialogContainer = new VBox();
-        scrollPane.setContent(dialogContainer);
-
-        TextField userInput = new TextField();
-        Button sendButton = new Button("Send");
-
-        DialogBox dialogBox = new DialogBox("Hello!", userImage);
-        dialogContainer.getChildren().addAll(dialogBox);
-
+        scrollPane = new ScrollPane();
+        dialogContainer = new VBox();
+        userInput = new TextField();
+        sendButton = new Button("Send");
         AnchorPane mainLayout = new AnchorPane();
+        scene = new Scene(mainLayout);
+
+        scrollPane.setContent(dialogContainer);
         mainLayout.getChildren().addAll(scrollPane, userInput, sendButton);
 
-        Scene scene = new Scene(mainLayout);
 
         stage.setScene(scene);
         stage.setTitle("Duke");
@@ -64,5 +65,24 @@ public class Main extends Application {
         AnchorPane.setBottomAnchor(userInput, 1.0);
 
         stage.show();
+
+        sendButton.setOnMouseClicked((event) -> {
+            handleUserInput();
+        });
+        userInput.setOnAction((event) -> {
+            handleUserInput();
+        });
+
+        //Scroll down to the end every time dialogContainer's height changes.
+        dialogContainer.heightProperty().addListener((observable) -> scrollPane.setVvalue(1.0));
+    }
+
+    /**
+     * Creates a dialog box containing user input, and appends it to
+     * the dialog container. Clears the user input after processing.
+     */
+    private void handleUserInput() {
+        dialogContainer.getChildren().addAll(new DialogBox(userInput.getText(), userImage));
+        userInput.clear();
     }
 }
